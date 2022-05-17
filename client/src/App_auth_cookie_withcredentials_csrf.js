@@ -1,67 +1,37 @@
 // App.js
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 
+/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ * No more use of this
+
+    "proxy": "http://localhost:3001",
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ */
+
 const apiUrl = 'http://localhost:3001';
 
-/*
- * V1.0
- * Questo serve per mettere in ogni chiamata il Bearer
- * Ma nella verisone col token nel cookie non serve
- */ 
-// axios.interceptors.request.use(
-//   config => {
-//     const { origin } = new URL(config.url);
-//     const allowedOrigins = [apiUrl];
-//     const token = localStorage.getItem('token');
-//     if (allowedOrigins.includes(origin)) {
-//       config.headers.authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   error => {
-//     return Promise.reject(error);
-//   }
-// );
+axios.defaults.withCredentials = true;
 
 function App() {
   const storedJwt = localStorage.getItem('token');
-  
+
   const [jwt, setJwt] = useState(storedJwt || null);
   const [foods, setFoods] = useState([]);
   const [fetchError, setFetchError] = useState(null);
-  
+
   const [newFoodMessage, setNewFoodMessage] = useState(null);
 
-  /*
-   * V1.0
-   * Questo serve per mettere in ogni chiamata il Bearer
-   * Ma nella verisone col token nel cookie non serve
-   */ 
-  // const getJwt = async () => {
-  //   const { data } = await axios.get(`${apiUrl}/jwt`);
-  //   localStorage.setItem('token', data.token);
-  //   setJwt(data.token);
-  // };
-
   const getJwt = async () => {
-    // Per far leva sul proxy del sever di sviluppo, devi usare path relativi
-    const { data } = await axios.get(`/jwt`);
+    const { data } = await axios.get(`${apiUrl}/jwt`);
     setJwt(data.token);
-  }
+  };
 
   const getFoods = async () => {
     try {
-      /*
-       * V1.0
-       * Questo serve per mettere in ogni chiamata il Bearer
-       * Ma nella verisone col token nel cookie non serve
-       */ 
-      // const { data } = await axios.get(`${apiUrl}/foods`);
-      
-      // Per far leva sul proxy del sever di sviluppo, devi usare path relativi      
-      const { data } = await axios.get(`/foods`);
+      const { data } = await axios.get(`${apiUrl}/foods`);
       setFoods(data);
       setFetchError(null);
     } catch (err) {
@@ -71,7 +41,7 @@ function App() {
 
   const createFood = async () => {
     try {
-      const { data } = await axios.post('/foods');
+      const { data } = await axios.post(`${apiUrl}/foods`);
       setNewFoodMessage(data.message);
       setFetchError(null);
     } catch (err) {
@@ -81,12 +51,12 @@ function App() {
 
   useEffect(() => {
     const getCsrfToken = async () => {
-      const { data } = await axios.get('/csrf-token');
+      const { data } = await axios.get(`${apiUrl}/csrf-token`);
       axios.defaults.headers.post['X-CSRF-Token'] = data.csrfToken;
-     };
+    };
     getCsrfToken();
   }, []);
-  
+
   return (
     <>
       <section style={{ marginBottom: '10px' }}>

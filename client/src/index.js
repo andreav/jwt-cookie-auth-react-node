@@ -1,7 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+// import App from './App_auth_bearer';
+// import App from './App_auth_cookie';
+// import App from './App_auth_cookie_withcredentials';
+import App from './App_auth_cookie_withcredentials_csrf';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

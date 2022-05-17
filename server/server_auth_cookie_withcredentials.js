@@ -1,14 +1,15 @@
 // server.js
 const express = require('express');
-const { expressjwt: jwt } = require("express-jwt");
+const { expressjwt: jwt } = require('express-jwt');
 const jsonwebtoken = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const csrf = require('csurf')
-
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true
+}));
 
 const jwtSecret = 'secret123';
 app.get('/jwt', (req, res) => {
@@ -19,17 +20,11 @@ app.get('/jwt', (req, res) => {
 
 app.use(cookieParser());
 
-// il default estrae il coocki dall'Authorization Bearer
+// This version extracts token from 'Authorization Bearer'
 // app.use(jwt({ secret: jwtSecret, algorithms: ['HS256'] }));
 
-// Cosi gli dico di estrarlo dal coockie
+// this version extract token from cookie
 app.use(jwt({ secret: jwtSecret, algorithms: ['HS256'], getToken: req => req.cookies.token }));
-
-// Per evitare CSRF
-const csrfProtection = csrf({
-  cookie: true
-});
-app.use(csrfProtection);
 
 const foods = [
   { id: 1, description: 'burritos' },
@@ -38,20 +33,6 @@ const foods = [
 ];
 app.get('/foods', (req, res) => {
   res.json(foods);
-});
-
-app.get('/csrf-token', (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
-});
-
-app.post('/foods', (req, res) => {
-  foods.push({
-    id: foods.length + 1,
-    description: 'new food'
-  });
-  res.json({
-    message: 'Food created!'
-  });
 });
 
 app.listen(3001);
